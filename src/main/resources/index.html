@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShowBook | Find your next night out</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#16231f; --muted:#69736e; --paper:#f4f3ec; --white:#fffefa; --green:#215e49; --lime:#d6f06a; --line:#dfe2d8; --coral:#e86c52; }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:'DM Sans',sans-serif; }
+    button,input,select { font:inherit }
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding:20px max(5vw,24px); border-bottom:1px solid var(--line); background:var(--white); }
+    .brand { display:flex; gap:10px; align-items:center; font-size:20px; font-weight:700; letter-spacing:0; }
+    .brand-mark { display:grid; width:31px; height:31px; place-items:center; color:var(--ink); background:var(--lime); border-radius:50%; font-weight:700; }
+    .nav { display:flex; align-items:center; gap:28px; color:var(--muted); font-size:13px; }
+    .nav a { color:inherit; text-decoration:none }
+    .nav .nav-cta { padding:11px 16px; background:var(--green); color:white; border-radius:4px; }
+    main { max-width:1160px; margin:auto; padding:56px 24px 72px; }
+    .intro { display:grid; grid-template-columns:1fr auto; align-items:end; gap:24px; margin-bottom:30px; }
+    .eyebrow { margin:0 0 12px; color:var(--green); font-weight:700; font-size:11px; letter-spacing:1.6px; text-transform:uppercase; }
+    h1 { margin:0; font:700 clamp(34px,5vw,54px)/1.08 'Playfair Display',serif; letter-spacing:0; }
+    .intro-copy { max-width:350px; margin:0 0 3px; color:var(--muted); line-height:1.6; font-size:14px; }
+    .filters { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 0 20px; }
+    .filter-search { flex:1 1 230px; position:relative; }
+    .filter-search input { width:100%; padding:12px 14px 12px 39px; border:1px solid var(--line); border-radius:4px; background:var(--white); outline-color:var(--green); }
+    .search-icon { position:absolute; left:14px; top:11px; color:var(--muted); }
+    .filter-select { min-width:155px; padding:12px; border:1px solid var(--line); background:var(--white); border-radius:4px; color:var(--ink); }
+    .event-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+    .event-card { display:flex; flex-direction:column; min-width:0; background:var(--white); border:1px solid var(--line); border-radius:5px; overflow:hidden; animation:rise .35s ease both; }
+    .event-art { height:150px; display:flex; align-items:flex-end; justify-content:space-between; padding:16px; color:white; background:linear-gradient(130deg,#175a4b,#76a37b); position:relative; isolation:isolate; }
+    .event-art:before { content:''; position:absolute; z-index:-1; inset:0; opacity:.45; background:radial-gradient(ellipse at 72% 25%,#d6f06a 0,transparent 25%),repeating-linear-gradient(135deg,transparent 0 22px,rgba(255,255,255,.14) 23px 24px); }
+    .event-card:nth-child(3n + 2) .event-art { background:linear-gradient(130deg,#a44f3b,#ed9d61); }
+    .event-card:nth-child(3n) .event-art { background:linear-gradient(130deg,#42517a,#93a0be); }
+    .event-art .date-badge { padding:7px 9px; background:var(--lime); color:var(--ink); font-weight:700; font-size:11px; text-transform:uppercase; }
+    .event-art .category { font-size:11px; font-weight:600; text-shadow:0 1px 6px #3338; }
+    .event-info { display:flex; flex:1; flex-direction:column; padding:18px; }
+    .event-info h2 { margin:0 0 7px; font:700 21px/1.2 'Playfair Display',serif; letter-spacing:0; }
+    .event-desc { min-height:40px; margin:0 0 17px; color:var(--muted); font-size:12px; line-height:1.55; }
+    .event-meta { display:grid; gap:7px; padding-top:13px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+    .event-meta strong { color:var(--ink); font-weight:600; }
+    .booking-row { display:flex; align-items:center; gap:8px; margin-top:16px; }
+    .ticket-select { flex:1; min-width:0; padding:10px 8px; border:1px solid var(--line); border-radius:4px; background:white; color:var(--ink); font-size:12px; }
+    .book-button { padding:11px 14px; border:0; border-radius:4px; color:white; background:var(--green); font-size:12px; font-weight:700; cursor:pointer; }
+    .book-button:hover,.nav-cta:hover { background:#174a39; }
+    .book-button:disabled { opacity:.45; cursor:not-allowed; }
+    .status { min-height:18px; margin-top:9px; font-size:11px; }
+    .status.error { color:#b23c2a; } .status.success { color:var(--green); }
+    .empty { grid-column:1/-1; padding:50px 15px; text-align:center; color:var(--muted); background:var(--white); border:1px dashed var(--line); }
+    .history { margin-top:58px; border-top:1px solid var(--line); padding-top:26px; }
+    .history-head { display:flex; align-items:end; justify-content:space-between; margin-bottom:14px; }
+    .history h2 { margin:0; font:700 25px 'Playfair Display',serif; letter-spacing:0; }
+    .history-note { color:var(--muted); font-size:12px; }
+    .booking-list { border-top:1px solid var(--line); }
+    .booking-item { display:grid; grid-template-columns:1.3fr 1.4fr 1fr auto; gap:16px; align-items:center; padding:14px 4px; border-bottom:1px solid var(--line); font-size:12px; }
+    .booking-item strong { display:block; margin-bottom:4px; font-size:13px; }
+    .booking-item span { color:var(--muted); }
+    .total { font-weight:700; }
+    footer { display:flex; justify-content:space-between; padding:20px max(5vw,24px); border-top:1px solid var(--line); color:var(--muted); font-size:11px; }
+    @keyframes rise { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+    @media(max-width:800px) { .event-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .intro { grid-template-columns:1fr; } .intro-copy { max-width:560px; } }
+    @media(max-width:540px) { .topbar { padding:15px 18px; } .nav { gap:12px; } .nav a:first-child { display:none; } main { padding:36px 16px 50px; } .event-grid { grid-template-columns:1fr; } .event-art { height:135px; } .booking-item { grid-template-columns:1fr auto; gap:8px; } .history-note { display:none; } footer { padding:18px; gap:15px; flex-wrap:wrap; } }
+    @media(prefers-reduced-motion:reduce) { *,*:before,*:after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">S</span> showbook</div>
+    <nav class="nav"><a href="#events">Discover</a><a href="#bookings">My bookings</a><a class="nav-cta" href="#events">Find a show</a></nav>
+  </header>
+  <main>
+    <section class="intro" id="events">
+      <div><p class="eyebrow">Good nights start here</p><h1>Make a night<br>of it.</h1></div>
+      <p class="intro-copy">Live music, quick laughs, and close-up performances. Pick a show, choose your seats, and we'll save your place.</p>
+    </section>
+    <section aria-label="Find an event">
+      <div class="filters">
+        <label class="filter-search"><span class="search-icon" aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search shows or cities" aria-label="Search shows or cities"></label>
+        <select class="filter-select" id="city-filter" aria-label="Filter by city"><option value="">All cities</option></select>
+      </div>
+      <div class="event-grid" id="events-list" aria-live="polite"><div class="empty">Finding upcoming shows...</div></div>
+    </section>
+    <section class="history" id="bookings">
+      <div class="history-head"><h2>Recent bookings</h2><span class="history-note">Your latest reservations</span></div>
+      <div class="booking-list" id="booking-list"><div class="history-note">No bookings yet. Your first night out is waiting.</div></div>
+    </section>
+  </main>
+  <footer><span>showbook &middot; Live a little.</span><span>Questions? hello@showbook.example</span></footer>
+  <script>
+    const eventList = document.querySelector('#events-list');
+    const cityFilter = document.querySelector('#city-filter');
+    const searchInput = document.querySelector('#search');
+    let allEvents = [];
+
+    const money = value => new Intl.NumberFormat('en-GB', { style:'currency', currency:'GBP' }).format(value);
+    const prettyDate = value => new Date(value).toLocaleString('en-GB', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
+
+    async function loadEvents() {
+      try {
+        const response = await fetch('/api/events');
+        if (!response.ok) throw new Error('Could not load shows.');
+        allEvents = await response.json();
+        const cities = [...new Set(allEvents.map(event => event.city))].sort();
+        cityFilter.innerHTML = '<option value="">All cities</option>' + cities.map(city => `<option value="${city}">${city}</option>`).join('');
+        renderEvents();
+      } catch (error) {
+        eventList.innerHTML = `<div class="empty">${error.message}</div>`;
+      }
+    }
+
+    function renderEvents() {
+      const query = searchInput.value.trim().toLowerCase();
+      const city = cityFilter.value;
+      const visible = allEvents.filter(event => (!city || event.city === city) &&
+        `${event.title} ${event.description} ${event.city} ${event.venue}`.toLowerCase().includes(query));
+      if (!visible.length) {
+        eventList.innerHTML = '<div class="empty">No shows match that search. Try another city or title.</div>';
+        return;
+      }
+      eventList.innerHTML = visible.map((event, index) => {
+        const tickets = event.tickets.map(ticket => `<option value="${ticket.id}" ${ticket.available < 1 ? 'disabled' : ''}>${ticket.name} &middot; ${money(ticket.price)}${ticket.available < 1 ? ' (sold out)' : ` &middot; ${ticket.available} left`}</option>`).join('');
+        return `<article class="event-card" style="animation-delay:${index * 55}ms">
+          <div class="event-art"><span class="date-badge">${prettyDate(event.date).split(',').slice(0,2).join(',')}</span><span class="category">LIVE EVENT</span></div>
+          <div class="event-info"><h2>${event.title}</h2><p class="event-desc">${event.description}</p>
+            <div class="event-meta"><span><strong>${prettyDate(event.date)}</strong></span><span>${event.venue} &middot; ${event.city}</span></div>
+            <div class="booking-row"><select class="ticket-select" aria-label="Ticket type for ${event.title}">${tickets}</select><button class="book-button" data-event="${event.id}">Book tickets</button></div>
+            <div class="status" role="status"></div>
+          </div></article>`;
+      }).join('');
+      eventList.querySelectorAll('.book-button').forEach(button => button.addEventListener('click', () => startBooking(button)));
+    }
+
+    async function startBooking(button) {
+      const card = button.closest('.event-card');
+      const ticketId = Number(card.querySelector('.ticket-select').value);
+      const ticket = allEvents.flatMap(event => event.tickets).find(item => item.id === ticketId);
+      if (!ticket || ticket.available < 1) return;
+      const name = prompt('Name for the booking:');
+      if (!name) return;
+      const email = prompt('Email for the booking:');
+      if (!email) return;
+      const amount = Number(prompt('How many tickets? (1-10)', '2'));
+      if (!Number.isInteger(amount) || amount < 1 || amount > 10) {
+        setStatus(card, 'Choose a quantity from 1 to 10.', true);
+        return;
+      }
+      button.disabled = true;
+      try {
+        const response = await fetch('/api/bookings', {
+          method:'POST', headers:{ 'Content-Type':'application/json' },
+          body:JSON.stringify({ name, email, ticketTypeId:ticketId, quantity:amount })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Booking failed.');
+        setStatus(card, `Booked! Confirmation #${result.bookingId} &middot; ${money(result.total)}`);
+        await Promise.all([loadEvents(), loadBookings()]);
+      } catch (error) {
+        setStatus(card, error.message, true);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function setStatus(card, message, isError = false) {
+      const status = card.querySelector('.status');
+      status.textContent = message;
+      status.className = `status ${isError ? 'error' : 'success'}`;
+    }
+
+    async function loadBookings() {
+      const list = document.querySelector('#booking-list');
+      try {
+        const response = await fetch('/api/bookings');
+        if (!response.ok) throw new Error();
+        const bookings = await response.json();
+        list.innerHTML = bookings.length ? bookings.map(booking => `<div class="booking-item">
+          <div><strong>${escapeHtml(booking.event)}</strong><span>${escapeHtml(booking.ticket)}</span></div>
+          <div><strong>${escapeHtml(booking.customer)}</strong><span>${prettyDate(booking.bookedAt)}</span></div>
+          <div><strong>${booking.quantity} ticket${booking.quantity === 1 ? '' : 's'}</strong><span>Confirmation #${booking.id}</span></div>
+          <div class="total">${money(booking.total)}</div>
+        </div>`).join('') : '<div class="history-note" style="padding:15px 0">No bookings yet. Your first night out is waiting.</div>';
+      } catch {
+        list.innerHTML = '<div class="history-note" style="padding:15px 0">Booking history is unavailable right now.</div>';
+      }
+    }
+
+    searchInput.addEventListener('input', renderEvents);
+    cityFilter.addEventListener('change', renderEvents);
+    loadEvents();
+    loadBookings();
+  </script>
+</body>
+</html>
